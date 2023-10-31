@@ -97,7 +97,14 @@ function testGeneric() {
   ];
 
   try {
+    const startTime = Date.now();
     const sortedDocuments = sortingArray(documents, criteria);
+    const endTime = Date.now();
+    const elapsedTime = endTime - startTime;
+
+    console.log(
+      `Tempo di esecuzione dell'ordinamento: ${elapsedTime} millisecondi`
+    );
 
     if (!compareArrays(sortedDocuments, expected)) {
       verify(false, logErrors(sortedDocuments));

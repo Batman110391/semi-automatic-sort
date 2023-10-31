@@ -3,6 +3,10 @@ import { assert } from "chai";
 
 import { sortingArray } from "../src/index";
 import npmPackage from "../src/index";
+import generateRandomDocumentsArray from "../utils/generateFakeData";
+
+const DEBUG_PERFORM = true;
+const TIME_PERFORMANCE_DEBUG = 0.1;
 
 /*
 Reacp test:
@@ -30,6 +34,35 @@ function compareArrays(arr1: any[], arr2: any[]): boolean {
   return true;
 }
 
+function sortingArrayWithPerformance(
+  documents: any[],
+  criteria?: any[],
+  options?: Object
+) {
+  let startTime: any, endTime: any, elapsedTime: any;
+
+  if (DEBUG_PERFORM) {
+    startTime = Date.now();
+  }
+
+  const result = sortingArray(documents, criteria, options);
+
+  if (DEBUG_PERFORM) {
+    endTime = Date.now();
+
+    elapsedTime = endTime - startTime;
+    console.log(`\n -> executions: ${elapsedTime} millisecondi`);
+    assert.ok(
+      parseFloat(elapsedTime) < documents.length || 1 * TIME_PERFORMANCE_DEBUG,
+      `Il tempo di esecuzione è superiore a ${
+        documents.length || 1 * TIME_PERFORMANCE_DEBUG
+      } millisecondi: ${elapsedTime}`
+    );
+  }
+
+  return result;
+}
+
 describe("NPM Package", () => {
   it("should be an object", () => {
     assert.isObject(npmPackage);
@@ -47,6 +80,23 @@ describe("sortingArray Function", () => {
 
   it("should return an empty array when given an empty array as input", () => {
     assert.deepStrictEqual(sortingArray([], []), []);
+  });
+
+  it("should performance big Data", () => {
+    const fakeDocumentData = generateRandomDocumentsArray(10000);
+
+    const criteria = [
+      {
+        field: "newspaperType",
+        priorities: ["Newspaper", "Magazine"],
+      },
+      {
+        field: "authorName",
+        basedOn: { field: "newspaperType", value: "Newspaper" },
+        priorities: ["John Smith", "Daniel Wilson", "William Thompson"],
+      },
+    ];
+    sortingArrayWithPerformance(fakeDocumentData, criteria);
   });
 
   it("should sort the documents based on the priorities specified in 'criteria'", () => {
