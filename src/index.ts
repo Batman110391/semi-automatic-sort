@@ -1,3 +1,5 @@
+type ErrorName = "INVALID_INPUT" | "UNEXPECTED_ERROR";
+
 type Document = Record<string, any>;
 
 type GetValueFunction = (doc: Document, key: string) => any;
@@ -9,20 +11,45 @@ type SortingOptions = {
 
 type PriorityConfig = {
   field: string;
-  priorities: string[];
+  priorities: (string | number | boolean)[];
   basedOn?: {
     field: string;
     value: any;
   };
 };
 
-export function semiAutomaticSorting(
+class SortingError extends Error {
+  name: ErrorName;
+  message: string;
+  cause: any;
+
+  constructor({
+    name,
+    message,
+    cause,
+  }: {
+    name: ErrorName;
+    message: string;
+    cause?: any;
+  }) {
+    super();
+    this.name = name;
+    this.message = message;
+    this.cause = cause;
+  }
+}
+
+export function sortingArray(
   documents: Document[],
-  documentsElementToReorders: PriorityConfig[],
+  criteria: PriorityConfig[] = [],
   options?: SortingOptions
 ) {
-  if (!Array.isArray(documents) || !Array.isArray(documentsElementToReorders)) {
-    return [];
+  if (!Array.isArray(documents) || !Array.isArray(criteria)) {
+    throw new SortingError({
+      name: "INVALID_INPUT",
+      message:
+        "Invalid input. The documents and criteria should be provided as arrays.",
+    });
   }
 
   const { caseInsensitive = false, customGetValue } = options || {};
@@ -30,16 +57,13 @@ export function semiAutomaticSorting(
   try {
     return documents
       .slice()
-      .sort(
-        sortByPriority(
-          documentsElementToReorders,
-          caseInsensitive,
-          customGetValue
-        )
-      );
+      .sort(sortByPriority(criteria, caseInsensitive, customGetValue));
   } catch (error) {
-    console.error(error);
-    return documents;
+    throw new SortingError({
+      name: "UNEXPECTED_ERROR",
+      message: "An unexpected error occurred during sorting.",
+      cause: error,
+    });
   }
 }
 
@@ -95,23 +119,32 @@ function getValue(
 
 function searchValue(
   value: any,
-  priorityValues: string[],
+  priorityValues: (string | number | boolean)[],
   caseInsensitive: boolean
 ) {
-  if (!Array.isArray(priorityValues) || !value) return -1;
+  if (!Array.isArray(priorityValues) || value === undefined || value === null)
+    return -1;
 
   if (caseInsensitive) {
     if (Array.isArray(value)) {
       return priorityValues.findIndex((pv) => {
-        return value.find(
-          (v) => v.trim().toLowerCase() === pv.trim().toLowerCase()
-        );
+        if (typeof pv === "string") {
+          return value.find(
+            (v) => v.trim().toLowerCase() === pv.trim().toLowerCase()
+          );
+        }
+        return value.find((v) => v === pv);
       });
     }
 
-    const word = value.trim().toLowerCase();
+    const word = typeof value === "string" ? value.trim().toLowerCase() : value;
 
-    return priorityValues.findIndex((val) => val.trim().toLowerCase() === word);
+    return priorityValues.findIndex((val) => {
+      if (typeof val === "string") {
+        return val.trim().toLowerCase() === word;
+      }
+      return val === word;
+    });
   }
 
   if (Array.isArray(value)) {
@@ -124,5 +157,5 @@ function searchValue(
 }
 
 export default {
-  semiAutomaticSorting,
+  sortingArray,
 };

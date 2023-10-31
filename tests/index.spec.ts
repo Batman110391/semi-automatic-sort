@@ -1,14 +1,14 @@
 import "mocha";
 import { assert } from "chai";
 
-import { semiAutomaticSorting } from "../src/index";
+import { sortingArray } from "../src/index";
 import npmPackage from "../src/index";
 
 /*
 Reacp test:
 
 "should return an empty array when given an empty array as input"
-"should sort the documents based on the priorities specified in 'documentsElementToReorders'"
+"should sort the documents based on the priorities specified in 'criteria'"
 "should sort the documents based on multiple levels of priorities"
 "should handle documents with missing fields"
 "should handle documents with duplicate entries"
@@ -35,21 +35,21 @@ describe("NPM Package", () => {
     assert.isObject(npmPackage);
   });
 
-  it("should have a semiAutomaticSorting property", () => {
-    assert.property(npmPackage, "semiAutomaticSorting");
+  it("should have a sortingArray property", () => {
+    assert.property(npmPackage, "sortingArray");
   });
 });
 
-describe("semiAutomaticSorting Function", () => {
+describe("sortingArray Function", () => {
   it("should be a function", () => {
-    assert.isFunction(semiAutomaticSorting);
+    assert.isFunction(sortingArray);
   });
 
   it("should return an empty array when given an empty array as input", () => {
-    assert.deepStrictEqual(semiAutomaticSorting([], []), []);
+    assert.deepStrictEqual(sortingArray([], []), []);
   });
 
-  it("should sort the documents based on the priorities specified in 'documentsElementToReorders'", () => {
+  it("should sort the documents based on the priorities specified in 'criteria'", () => {
     const documents = [
       {
         newspaperType: "Newspaper",
@@ -103,7 +103,7 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const documentsElementToReorders = [
+    const criteria = [
       {
         field: "newspaperType",
         priorities: ["Newspaper", "Magazine"],
@@ -184,14 +184,11 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const sortedDocuments = semiAutomaticSorting(
-      documents,
-      documentsElementToReorders
-    );
+    const sortedDocuments = sortingArray(documents, criteria);
 
     if (!compareArrays(sortedDocuments, expected)) {
       console.log(
-        "should sort the documents based on the priorities specified in 'documentsElementToReorders'",
+        "should sort the documents based on the priorities specified in 'criteria'",
         sortedDocuments
       );
     }
@@ -248,7 +245,7 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const documentsElementToReorders = [
+    const criteria = [
       {
         field: "newspaperType",
         priorities: ["Newspaper", "Magazine"],
@@ -329,10 +326,7 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const sortedDocuments = semiAutomaticSorting(
-      documents,
-      documentsElementToReorders
-    );
+    const sortedDocuments = sortingArray(documents, criteria);
 
     if (!compareArrays(sortedDocuments, expected)) {
       console.log(
@@ -369,7 +363,7 @@ describe("semiAutomaticSorting Function", () => {
       { authorName: "Olivia Roberts", articleTitle: "Art and Culture" },
     ];
 
-    const documentsElementToReorders = [
+    const criteria = [
       {
         field: "newspaperType",
         priorities: ["Newspaper", "Magazine"],
@@ -421,10 +415,7 @@ describe("semiAutomaticSorting Function", () => {
       { authorName: "Olivia Roberts", articleTitle: "Art and Culture" },
     ];
 
-    const sortedDocuments = semiAutomaticSorting(
-      documents,
-      documentsElementToReorders
-    );
+    const sortedDocuments = sortingArray(documents, criteria);
 
     if (!compareArrays(sortedDocuments, expected)) {
       console.log(
@@ -456,7 +447,7 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const documentsElementToReorders = [
+    const criteria = [
       {
         field: "newspaperType",
         priorities: ["Newspaper", "Magazine"],
@@ -503,10 +494,7 @@ describe("semiAutomaticSorting Function", () => {
       { newspaperType: "Magazine", authorName: "Sarah Thompson" },
     ];
 
-    const sortedDocuments = semiAutomaticSorting(
-      documents,
-      documentsElementToReorders
-    );
+    const sortedDocuments = sortingArray(documents, criteria);
 
     if (!compareArrays(sortedDocuments, expected)) {
       console.log(
@@ -542,7 +530,7 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const documentsElementToReorders = [
+    const criteria = [
       {
         field: "newspaperType",
         priorities: ["Newspaper", "Magazine"],
@@ -582,10 +570,7 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const sortedDocuments = semiAutomaticSorting(
-      documents,
-      documentsElementToReorders
-    );
+    const sortedDocuments = sortingArray(documents, criteria);
 
     if (!compareArrays(sortedDocuments, expected)) {
       console.log(
@@ -621,7 +606,7 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const documentsElementToReorders = [
+    const criteria = [
       {
         field: "newspaperType",
         priorities: ["Newspaper", "Magazine"],
@@ -661,10 +646,7 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const sortedDocuments = semiAutomaticSorting(
-      documents,
-      documentsElementToReorders
-    );
+    const sortedDocuments = sortingArray(documents, criteria);
 
     if (!compareArrays(sortedDocuments, expected)) {
       console.log(
@@ -700,7 +682,7 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const documentsElementToReorders = [
+    const criteria = [
       {
         field: "newspaperType",
         priorities: ["Newspaper", "Magazine"],
@@ -738,10 +720,7 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const sortedDocuments = semiAutomaticSorting(
-      documents,
-      documentsElementToReorders
-    );
+    const sortedDocuments = sortingArray(documents, criteria);
 
     if (!compareArrays(sortedDocuments, expected)) {
       console.log(
@@ -777,7 +756,7 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const documentsElementToReorders = [
+    const criteria = [
       {
         field: "newspaperType",
         priorities: ["newspaper", "magazine"],
@@ -812,17 +791,71 @@ describe("semiAutomaticSorting Function", () => {
       },
     ];
 
-    const sortedDocuments = semiAutomaticSorting(
-      documents,
-      documentsElementToReorders,
-      {
-        caseInsensitive: true,
-      }
-    );
+    const sortedDocuments = sortingArray(documents, criteria, {
+      caseInsensitive: true,
+    });
 
     if (!compareArrays(sortedDocuments, expected)) {
       console.log(
         "should handle documents with case insensitive params options",
+        sortedDocuments
+      );
+    }
+
+    assert.deepStrictEqual(sortedDocuments, expected);
+  });
+
+  it("should handle documents with parameter options that have numeric values", () => {
+    const documents = [
+      {
+        playerName: "Totti",
+        shirtNumber: 10,
+      },
+      {
+        playerName: "Pirlo",
+        shirtNumber: 21,
+      },
+      {
+        playerName: "Del Piero",
+        shirtNumber: 10,
+      },
+      {
+        playerName: "Baggio",
+        shirtNumber: 10,
+      },
+    ];
+
+    const criteria = [
+      {
+        field: "shirtNumber",
+        priorities: [10],
+      },
+    ];
+
+    const expected = [
+      {
+        playerName: "Totti",
+        shirtNumber: 10,
+      },
+      {
+        playerName: "Del Piero",
+        shirtNumber: 10,
+      },
+      {
+        playerName: "Baggio",
+        shirtNumber: 10,
+      },
+      {
+        playerName: "Pirlo",
+        shirtNumber: 21,
+      },
+    ];
+
+    const sortedDocuments = sortingArray(documents, criteria);
+
+    if (!compareArrays(sortedDocuments, expected)) {
+      console.log(
+        "should handle documents with parameter options that have numeric values",
         sortedDocuments
       );
     }
