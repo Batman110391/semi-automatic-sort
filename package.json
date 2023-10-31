@@ -39,7 +39,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/snyk-labs/modern-npm-package.git"
+    "url": "https://github.com/Batman110391/sort-array-criteria.git"
   },
   "keywords": [
     "npm",
@@ -50,16 +50,16 @@
     "nodejs",
     "commonjs",
     "ecmascript",
-    "beginner",
-    "example",
-    "demonstration"
+    "array",
+    "sort",
+    "criteria"
   ],
-  "author": "Snyk Labs",
+  "author": "Simone Gattinara",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/snyk-labs/modern-npm-package/issues"
+    "url": "https://github.com/Batman110391/sort-array-criteria/issues"
   },
-  "homepage": "https://github.com/snyk-labs/modern-npm-package#readme",
+  "homepage": "https://github.com/Batman110391/sort-array-criteria#readme",
   "devDependencies": {
     "@types/chai": "^4.3.3",
     "@types/mocha": "^9.1.1",
