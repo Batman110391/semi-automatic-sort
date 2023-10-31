@@ -117,7 +117,7 @@ function getValue(
   return basedOnValues[field] || obj[field];
 }
 
-function searchValue(
+export function searchValue(
   value: any,
   priorityValues: (string | number | boolean)[],
   caseInsensitive: boolean
@@ -125,37 +125,38 @@ function searchValue(
   if (!Array.isArray(priorityValues) || value === undefined || value === null)
     return -1;
 
-  if (caseInsensitive) {
-    if (Array.isArray(value)) {
-      return priorityValues.findIndex((pv) => {
-        if (typeof pv === "string") {
-          return value.find(
-            (v) => v.trim().toLowerCase() === pv.trim().toLowerCase()
-          );
-        }
-        return value.find((v) => v === pv);
-      });
+  const normalizedValue = normalizeValue(value, caseInsensitive);
+
+  for (let i = 0; i < priorityValues.length; i++) {
+    const normalizedPriorityValue = normalizeValue(
+      priorityValues[i],
+      caseInsensitive
+    );
+    if (isEqual(normalizedValue, normalizedPriorityValue)) {
+      return i;
     }
-
-    const word = typeof value === "string" ? value.trim().toLowerCase() : value;
-
-    return priorityValues.findIndex((val) => {
-      if (typeof val === "string") {
-        return val.trim().toLowerCase() === word;
-      }
-      return val === word;
-    });
   }
 
-  if (Array.isArray(value)) {
-    return priorityValues.findIndex((pv) => {
-      return value.includes(pv);
-    });
-  }
-
-  return priorityValues.indexOf(value);
+  return -1;
 }
 
+function normalizeValue(
+  value: any,
+  caseInsensitive: boolean
+): string | number | boolean {
+  if (typeof value === "string") {
+    return caseInsensitive ? value.trim().toLowerCase() : value.trim();
+  }
+  return value;
+}
+
+function isEqual(
+  value1: string | number | boolean,
+  value2: string | number | boolean
+): boolean {
+  return value1 === value2;
+}
 export default {
   sortingArray,
+  searchValue,
 };

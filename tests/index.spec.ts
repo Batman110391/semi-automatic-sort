@@ -1,26 +1,9 @@
 import "mocha";
 import { assert } from "chai";
 
-import { sortingArray } from "../src/index";
+import { searchValue, sortingArray } from "../src/index";
 import npmPackage from "../src/index";
 import generateRandomDocumentsArray from "../utils/generateFakeData";
-
-const DEBUG_PERFORM = true;
-const TIME_PERFORMANCE_DEBUG = 0.1;
-
-/*
-Reacp test:
-
-"should return an empty array when given an empty array as input"
-"should sort the documents based on the priorities specified in 'criteria'"
-"should sort the documents based on multiple levels of priorities"
-"should handle documents with missing fields"
-"should handle documents with duplicate entries"
-"should handle documents with missing basedOn field"
-"should handle documents with missing fields in basedOn condition"
-"should handle documents with missing basedOn"
-"should handle documents with case insensitive params options"
-*/
 
 function compareArrays(arr1: any[], arr2: any[]): boolean {
   if (arr1.length !== arr2.length) {
@@ -32,35 +15,6 @@ function compareArrays(arr1: any[], arr2: any[]): boolean {
   }
 
   return true;
-}
-
-function sortingArrayWithPerformance(
-  documents: any[],
-  criteria?: any[],
-  options?: Object
-) {
-  let startTime: any, endTime: any, elapsedTime: any;
-
-  if (DEBUG_PERFORM) {
-    startTime = Date.now();
-  }
-
-  const result = sortingArray(documents, criteria, options);
-
-  if (DEBUG_PERFORM) {
-    endTime = Date.now();
-
-    elapsedTime = endTime - startTime;
-    console.log(`\n -> executions: ${elapsedTime} millisecondi`);
-    assert.ok(
-      parseFloat(elapsedTime) < documents.length || 1 * TIME_PERFORMANCE_DEBUG,
-      `Il tempo di esecuzione è superiore a ${
-        documents.length || 1 * TIME_PERFORMANCE_DEBUG
-      } millisecondi: ${elapsedTime}`
-    );
-  }
-
-  return result;
 }
 
 describe("NPM Package", () => {
@@ -80,23 +34,6 @@ describe("sortingArray Function", () => {
 
   it("should return an empty array when given an empty array as input", () => {
     assert.deepStrictEqual(sortingArray([], []), []);
-  });
-
-  it("should performance big Data", () => {
-    const fakeDocumentData = generateRandomDocumentsArray(10000);
-
-    const criteria = [
-      {
-        field: "newspaperType",
-        priorities: ["Newspaper", "Magazine"],
-      },
-      {
-        field: "authorName",
-        basedOn: { field: "newspaperType", value: "Newspaper" },
-        priorities: ["John Smith", "Daniel Wilson", "William Thompson"],
-      },
-    ];
-    sortingArrayWithPerformance(fakeDocumentData, criteria);
   });
 
   it("should sort the documents based on the priorities specified in 'criteria'", () => {
@@ -911,5 +848,57 @@ describe("sortingArray Function", () => {
     }
 
     assert.deepStrictEqual(sortedDocuments, expected);
+  });
+});
+
+describe("SearchValue Function", () => {
+  it("should return the index when the value is found in the priority values", () => {
+    const priorityValues = ["apple", "banana", "cherry", "date"];
+    const value1 = "banana";
+    const value2 = "Cherry";
+    const value3 = 10;
+
+    assert.strictEqual(searchValue(value1, priorityValues, true), 1);
+    assert.strictEqual(searchValue(value2, priorityValues, true), 2);
+    assert.strictEqual(searchValue(value3, priorityValues, false), -1);
+  });
+
+  it("should return -1 when the value is not found in the priority values", () => {
+    const priorityValues = ["apple", "banana", "cherry", "date"];
+    const value1 = "grape";
+    const value2 = "kiwi";
+    const value3 = 10;
+
+    assert.strictEqual(searchValue(value1, priorityValues, true), -1);
+    assert.strictEqual(searchValue(value2, priorityValues, true), -1);
+    assert.strictEqual(searchValue(value3, priorityValues, false), -1);
+  });
+
+  it("should handle null and undefined values", () => {
+    const priorityValues = ["apple", "banana", "cherry", "date"];
+    const value1 = null;
+    const value2 = undefined;
+
+    assert.strictEqual(searchValue(value1, priorityValues, true), -1);
+    assert.strictEqual(searchValue(value2, priorityValues, true), -1);
+  });
+});
+
+describe("sortingArray Function performance", () => {
+  it("should performance big Data", () => {
+    const fakeDocumentData = generateRandomDocumentsArray(100000);
+
+    const criteria = [
+      {
+        field: "newspaperType",
+        priorities: ["Newspaper", "Magazine"],
+      },
+      {
+        field: "authorName",
+        basedOn: { field: "newspaperType", value: "Newspaper" },
+        priorities: ["John Smith", "Daniel Wilson", "William Thompson"],
+      },
+    ];
+    sortingArray(fakeDocumentData, criteria);
   });
 });
