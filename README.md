@@ -17,7 +17,9 @@ yarn add array-sort-criteria
 ## Usage
 
 ```javascript
-import { sortingArray } from "semi-automatic-sort";
+import { sortingArray } from "sort-array-criteria"; //ESM
+//or
+const { sortingArray } = require("sort-array-criteria"); //CJS
 
 //example
 const documents = [
@@ -189,63 +191,62 @@ const sortedDocuments = sortingArray(documents, criteria);
 #### caseInsensitive
 
 ```javascript
-const sortedDocuments = semiAutomaticSorting(
-  documents,
-  documentsElementToReorders,
-  {
-    caseInsensitive: true,
-  }
-);
+const sortedDocuments = semiAutomaticSorting(documents, criteria, {
+  caseInsensitive: true,
+});
 ```
 
 ##### customGetValue
 
-Suppose we have a case where the documents contain a complex object for the "author" field, and we want to sort the documents based on the authors' names. We can define a `customGetValue` function to specifically extract the authors' names from the documents:
+Suppose we have a case where the documents contain a complex object for the "name" and for "documents" field, and we want to sort the documents based on the authors' names. We can define a `customGetValue` function to specifically extract the authors' names from the documents:
 
 ```javascript
 const availableFields = [
-  { value: "author", type: "author", path: ["author", "name"] },
+  { value: "name", type: "author" },
+  { value: "documents", type: "publications" },
   // ... other fields available ...
 ];
 
 const customGetValue = (obj, field) => {
+  /*
+  	 Example obj
+      obj = {
+          name: {firstname: 'Mario', surname: 'Rossi'},
+          documents: [{title: 'fsrtDoc', year: 2010}, {title: 'secDoc', year: 2020}],
+          // ... other data ...
+      };
+
+      Example field
+      field = name | documents
+  */
+
   const fieldValue = availableFields.find((f) => f.value === field);
 
-  const { type, path } = fieldValue || {};
+  const { type } = fieldValue || {};
 
-  if (path) {
-    const currentValue = path.reduce((prev, curr) => {
-      const value = _.get(obj, curr);
+  const value = obj[field];
 
-      if (!prev && value) {
-        return value;
-      }
-      return prev;
-    }, null);
-
-    if (type === "author") {
-      if (Array.isArray(currentValue)) {
-        return currentValue.map((value) => value.name);
-      }
-
-      return currentValue;
-    }
-
-    return currentValue;
-  } else {
-    return null;
+  if (type === "author") {
+    // I just want the name as the calculation value
+    return value.firstname;
+  } else if (type === "publications") {
+    // Please consider only the titles of documents published
+    // by the author for a correct calculation
+    return value.map((d) => d.title);
   }
+
+  return value;
 };
 
 // Example of using the sort function with customGetValue
 const sortedDocuments = sortingSemiAutomaticCollectionByConfig(
   documents,
-  documentsElementToReorders,
+  criteria,
   { customGetValue }
 );
 ```
 
-In this example, the `customGetValue` function extracts author names from documents, allowing these values to be used during the sorting process. The logic defined within `customGetValue` is capable of manipulating the complex object and extracting the desired values for sorting. This allows for more precise control over the value extraction logic during the sorting process.
+The logic defined in _"customGetValue"_ can manipulate the complex object and extract the desired values for sorting. This allows for more precise control over the value extraction logic during the sorting process.
 
 #### ❤️ Support
 

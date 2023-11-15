@@ -849,6 +849,90 @@ describe("sortingArray Function", () => {
 
     assert.deepStrictEqual(sortedDocuments, expected);
   });
+
+  it("should sort the documents based on the priorities specified in the 'criteria', with a customGetValue", () => {
+    const documents = [
+      {
+        newspaperType: "Newspaper",
+        authorName: { firstname: "John Smith", surname: "xxx" },
+        articleTitle: "Breaking News",
+      },
+      {
+        newspaperType: "Magazine",
+        authorName: { firstname: "Emily Johnson", surname: "xxx" },
+        articleTitle: "Fashion Trends",
+      },
+      {
+        newspaperType: "Newspaper",
+        authorName: { firstname: "John Smith", surname: "xxx" },
+        articleTitle: "Sports Section",
+      },
+    ];
+
+    const criteria = [
+      {
+        field: "newspaperType",
+        priorities: ["Newspaper", "Magazine"],
+      },
+      {
+        field: "authorName",
+        basedOn: { field: "newspaperType", value: "Newspaper" },
+        priorities: ["John Smith"],
+      },
+      {
+        field: "authorName",
+        basedOn: { field: "newspaperType", value: "Magazine" },
+        priorities: ["Emily Johnson"],
+      },
+    ];
+
+    const expected = [
+      {
+        newspaperType: "Newspaper",
+        authorName: { firstname: "John Smith", surname: "xxx" },
+        articleTitle: "Breaking News",
+      },
+      {
+        newspaperType: "Newspaper",
+        authorName: { firstname: "John Smith", surname: "xxx" },
+        articleTitle: "Sports Section",
+      },
+      {
+        newspaperType: "Magazine",
+        authorName: { firstname: "Emily Johnson", surname: "xxx" },
+        articleTitle: "Fashion Trends",
+      },
+    ];
+
+    const availableFields = [{ value: "name", type: "author" }];
+
+    const customGetValue = (obj: any, field: any) => {
+      const fieldValue = availableFields.find((f) => f.value === field);
+
+      const { type } = fieldValue || {};
+
+      const value = obj[field];
+
+      if (type === "author") {
+        return value.firstname;
+      }
+
+      return value;
+    };
+
+    const sortedDocuments = sortingArray(documents, criteria, {
+      customGetValue,
+    });
+
+    if (!compareArrays(sortedDocuments, expected)) {
+      console.log(
+        "should sort the documents based on the priorities specified in 'criteria'",
+        sortedDocuments
+      );
+    }
+
+    assert.deepStrictEqual(sortedDocuments, expected);
+  });
 });
 
 describe("SearchValue Function", () => {
