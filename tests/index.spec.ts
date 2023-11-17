@@ -17,6 +17,8 @@ function compareArrays(arr1: any[], arr2: any[]): boolean {
   return true;
 }
 
+const DEBUG_MODE = false;
+
 describe("NPM Package", () => {
   it("should be an object", () => {
     assert.isObject(npmPackage);
@@ -173,7 +175,7 @@ describe("sortingArray Function", () => {
 
     const sortedDocuments = sortingArray(documents, criteria);
 
-    if (!compareArrays(sortedDocuments, expected)) {
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(
         "should sort the documents based on the priorities specified in 'criteria'",
         sortedDocuments
@@ -315,7 +317,7 @@ describe("sortingArray Function", () => {
 
     const sortedDocuments = sortingArray(documents, criteria);
 
-    if (!compareArrays(sortedDocuments, expected)) {
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(
         "should sort the documents based on multiple levels of priorities",
         sortedDocuments
@@ -404,7 +406,7 @@ describe("sortingArray Function", () => {
 
     const sortedDocuments = sortingArray(documents, criteria);
 
-    if (!compareArrays(sortedDocuments, expected)) {
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(
         "should handle documents with missing fields",
         sortedDocuments
@@ -483,7 +485,7 @@ describe("sortingArray Function", () => {
 
     const sortedDocuments = sortingArray(documents, criteria);
 
-    if (!compareArrays(sortedDocuments, expected)) {
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(
         "should handle documents with duplicate entries",
         sortedDocuments
@@ -559,7 +561,7 @@ describe("sortingArray Function", () => {
 
     const sortedDocuments = sortingArray(documents, criteria);
 
-    if (!compareArrays(sortedDocuments, expected)) {
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(
         "should handle documents with missing basedOn field",
         sortedDocuments
@@ -635,7 +637,7 @@ describe("sortingArray Function", () => {
 
     const sortedDocuments = sortingArray(documents, criteria);
 
-    if (!compareArrays(sortedDocuments, expected)) {
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(
         "should handle documents with missing fields in basedOn condition",
         sortedDocuments
@@ -709,7 +711,7 @@ describe("sortingArray Function", () => {
 
     const sortedDocuments = sortingArray(documents, criteria);
 
-    if (!compareArrays(sortedDocuments, expected)) {
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(
         "should handle documents with missing basedOn",
         sortedDocuments
@@ -782,7 +784,7 @@ describe("sortingArray Function", () => {
       caseInsensitive: true,
     });
 
-    if (!compareArrays(sortedDocuments, expected)) {
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(
         "should handle documents with case insensitive params options",
         sortedDocuments
@@ -840,7 +842,7 @@ describe("sortingArray Function", () => {
 
     const sortedDocuments = sortingArray(documents, criteria);
 
-    if (!compareArrays(sortedDocuments, expected)) {
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(
         "should handle documents with parameter options that have numeric values",
         sortedDocuments
@@ -924,9 +926,216 @@ describe("sortingArray Function", () => {
       customGetValue,
     });
 
-    if (!compareArrays(sortedDocuments, expected)) {
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(
         "should sort the documents based on the priorities specified in 'criteria'",
+        sortedDocuments
+      );
+    }
+
+    assert.deepStrictEqual(sortedDocuments, expected);
+  });
+
+  it("should sort the documents according to the priorities specified in the 'criteria' and that they are in ascending order", () => {
+    const documents = [
+      {
+        newspaperType: "Magazine",
+        authorName: "Sarah Thompson",
+        articleTitle: "Fashion Trends",
+      },
+      {
+        newspaperType: "Newspaper",
+        authorName: "William Thompson",
+        articleTitle: "Opinion Piece",
+      },
+      {
+        newspaperType: "Magazine",
+        authorName: "Emily Johnson",
+        articleTitle: "Travel Guide",
+      },
+      {
+        newspaperType: "Newspaper",
+        authorName: "Alan Smith",
+        articleTitle: "Sports Section",
+      },
+    ];
+
+    const criteria = [
+      {
+        field: "authorName",
+        priorities: ["William Thompson"],
+        order: "asc",
+      },
+    ];
+
+    const expected = [
+      {
+        newspaperType: "Newspaper",
+        authorName: "William Thompson",
+        articleTitle: "Opinion Piece",
+      },
+      {
+        newspaperType: "Newspaper",
+        authorName: "Alan Smith",
+        articleTitle: "Sports Section",
+      },
+      {
+        newspaperType: "Magazine",
+        authorName: "Emily Johnson",
+        articleTitle: "Travel Guide",
+      },
+      {
+        newspaperType: "Magazine",
+        authorName: "Sarah Thompson",
+        articleTitle: "Fashion Trends",
+      },
+    ];
+
+    const sortedDocuments = sortingArray(documents, criteria);
+
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
+      console.log(
+        "should sort the documents according to the priorities specified in the 'criteria' and that they are in ascending order",
+        sortedDocuments
+      );
+    }
+
+    assert.deepStrictEqual(sortedDocuments, expected);
+  });
+
+  it("should sort the documents in ascending order", () => {
+    const documents = [
+      {
+        newspaperType: "Magazine",
+        authorName: "Sarah Thompson",
+        articleTitle: "Fashion Trends",
+      },
+      {
+        newspaperType: "Newspaper",
+        authorName: "William Thompson",
+        articleTitle: "Opinion Piece",
+      },
+      {
+        newspaperType: "Magazine",
+        authorName: "Emily Johnson",
+        articleTitle: "Travel Guide",
+      },
+      {
+        newspaperType: "Newspaper",
+        authorName: "Alan Smith",
+        articleTitle: "Sports Section",
+      },
+    ];
+
+    const criteria = [
+      {
+        field: "authorName",
+        order: "asc",
+      },
+    ];
+
+    const expected = [
+      {
+        newspaperType: "Newspaper",
+        authorName: "Alan Smith",
+        articleTitle: "Sports Section",
+      },
+      {
+        newspaperType: "Magazine",
+        authorName: "Emily Johnson",
+        articleTitle: "Travel Guide",
+      },
+      {
+        newspaperType: "Magazine",
+        authorName: "Sarah Thompson",
+        articleTitle: "Fashion Trends",
+      },
+      {
+        newspaperType: "Newspaper",
+        authorName: "William Thompson",
+        articleTitle: "Opinion Piece",
+      },
+    ];
+
+    const sortedDocuments = sortingArray(documents, criteria);
+
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
+      console.log(
+        "should sort the documents in ascending order",
+        sortedDocuments
+      );
+    }
+
+    assert.deepStrictEqual(sortedDocuments, expected);
+  });
+
+  it("should sort documents in ascending order with date type", () => {
+    const documents = [
+      {
+        newspaperType: "Magazine",
+        authorName: "Sarah Thompson",
+        articleTitle: "Fashion Trends",
+        release: "2023-09-07",
+      },
+      {
+        newspaperType: "Newspaper",
+        authorName: "William Thompson",
+        articleTitle: "Opinion Piece",
+        release: "2020-03-11",
+      },
+      {
+        newspaperType: "Magazine",
+        authorName: "Emily Johnson",
+        articleTitle: "Travel Guide",
+        release: "1900-08-23",
+      },
+      {
+        newspaperType: "Newspaper",
+        authorName: "Alan Smith",
+        articleTitle: "Sports Section",
+        release: "2022-05-09",
+      },
+    ];
+
+    const criteria = [
+      {
+        field: "release",
+        order: "asc",
+      },
+    ];
+
+    const expected = [
+      {
+        newspaperType: "Magazine",
+        authorName: "Emily Johnson",
+        articleTitle: "Travel Guide",
+        release: "1900-08-23",
+      },
+      {
+        newspaperType: "Newspaper",
+        authorName: "William Thompson",
+        articleTitle: "Opinion Piece",
+        release: "2020-03-11",
+      },
+      {
+        newspaperType: "Newspaper",
+        authorName: "Alan Smith",
+        articleTitle: "Sports Section",
+        release: "2022-05-09",
+      },
+      {
+        newspaperType: "Magazine",
+        authorName: "Sarah Thompson",
+        articleTitle: "Fashion Trends",
+        release: "2023-09-07",
+      },
+    ];
+
+    const sortedDocuments = sortingArray(documents, criteria);
+
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
+      console.log(
+        "should sort documents in ascending order with date type",
         sortedDocuments
       );
     }

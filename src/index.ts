@@ -11,11 +11,12 @@ type SortingOptions = {
 
 type PriorityConfig = {
   field: string;
-  priorities: (string | number | boolean)[];
+  priorities?: (string | number | boolean)[];
   basedOn?: {
     field: string;
     value: any;
   };
+  order?: string;
 };
 
 class SortingError extends Error {
@@ -76,6 +77,7 @@ function sortByPriority(
     const basedOnValues: Record<string, any> = {};
     for (const priority of priorities) {
       const field = priority.field;
+      const order = priority.order;
       const priorityValues = priority.priorities;
       const basedOn = priority.basedOn;
 
@@ -87,9 +89,13 @@ function sortByPriority(
       const bValue = getValue(b, field, basedOnValues, customGetValue);
 
       const aPriorityIndex =
-        priorityValues && searchValue(aValue, priorityValues, caseInsensitive);
+        (priorityValues &&
+          searchValue(aValue, priorityValues, caseInsensitive)) ||
+        0;
       const bPriorityIndex =
-        priorityValues && searchValue(bValue, priorityValues, caseInsensitive);
+        (priorityValues &&
+          searchValue(bValue, priorityValues, caseInsensitive)) ||
+        0;
 
       if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
         if (aPriorityIndex > bPriorityIndex) return 1;
@@ -99,10 +105,32 @@ function sortByPriority(
       } else if (bPriorityIndex !== -1) {
         return 1;
       }
+
+      if (order) {
+        const isAscending = order === "asc";
+        const isDiscending = order === "desc";
+        if (isAscending) {
+          if (isNumber(aValue) && isNumber(bValue)) {
+            return aValue - bValue;
+          } else {
+            return aValue.localeCompare(bValue);
+          }
+        } else if (isDiscending) {
+          if (isNumber(aValue) && isNumber(bValue)) {
+            return bValue - aValue;
+          } else {
+            return bValue.localeCompare(aValue);
+          }
+        }
+      }
     }
 
     return 0;
   };
+}
+
+function isNumber(value: any) {
+  return typeof value === "number" && !!isNaN(value);
 }
 
 function getValue(
