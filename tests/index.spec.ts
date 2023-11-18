@@ -964,7 +964,6 @@ describe("sortingArray Function", () => {
       {
         field: "authorName",
         priorities: ["William Thompson"],
-        order: "asc",
       },
     ];
 
@@ -991,7 +990,7 @@ describe("sortingArray Function", () => {
       },
     ];
 
-    const sortedDocuments = sortingArray(documents, criteria);
+    const sortedDocuments = sortingArray(documents, criteria, { order: "asc" });
 
     if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(
@@ -1030,7 +1029,6 @@ describe("sortingArray Function", () => {
     const criteria = [
       {
         field: "authorName",
-        order: "asc",
       },
     ];
 
@@ -1057,7 +1055,7 @@ describe("sortingArray Function", () => {
       },
     ];
 
-    const sortedDocuments = sortingArray(documents, criteria);
+    const sortedDocuments = sortingArray(documents, criteria, { order: "asc" });
 
     if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(
@@ -1100,7 +1098,6 @@ describe("sortingArray Function", () => {
     const criteria = [
       {
         field: "release",
-        order: "asc",
       },
     ];
 
@@ -1131,7 +1128,34 @@ describe("sortingArray Function", () => {
       },
     ];
 
-    const sortedDocuments = sortingArray(documents, criteria);
+    const sortedDocuments = sortingArray(documents, criteria, { order: "asc" });
+
+    if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
+      console.log(
+        "should sort documents in ascending order with date type",
+        sortedDocuments
+      );
+    }
+
+    assert.deepStrictEqual(sortedDocuments, expected);
+  });
+
+  it("should sort array of string wothout criteria", () => {
+    const documents = [
+      "Sarah Thompson",
+      "William Thompson",
+      "Emily Johnson",
+      "Alan Smith",
+    ];
+
+    const expected = [
+      "Alan Smith",
+      "Emily Johnson",
+      "Sarah Thompson",
+      "William Thompson",
+    ];
+
+    const sortedDocuments = sortingArray(documents, null, { order: "asc" });
 
     if (DEBUG_MODE && !compareArrays(sortedDocuments, expected)) {
       console.log(

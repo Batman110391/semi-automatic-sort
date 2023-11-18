@@ -2,11 +2,14 @@ type ErrorName = "INVALID_INPUT" | "UNEXPECTED_ERROR";
 
 type Document = Record<string, any>;
 
-type GetValueFunction = (doc: Document, key: string) => any;
+type SortableData = Document | string | number;
+
+type GetValueFunction = (doc: SortableData, key: string) => any;
 
 type SortingOptions = {
   caseInsensitive?: boolean;
   customGetValue?: GetValueFunction;
+  order?: string;
 };
 
 type PriorityConfig = {
@@ -16,7 +19,6 @@ type PriorityConfig = {
     field: string;
     value: any;
   };
-  order?: string;
 };
 
 class SortingError extends Error {
@@ -41,11 +43,11 @@ class SortingError extends Error {
 }
 
 export function sortingArray(
-  documents: Document[],
-  criteria: PriorityConfig[] = [],
+  documents: Document[] | Array<string> | Array<number>,
+  criteria: PriorityConfig[] | null,
   options?: SortingOptions
 ) {
-  if (!Array.isArray(documents) || !Array.isArray(criteria)) {
+  if (!Array.isArray(documents)) {
     throw new SortingError({
       name: "INVALID_INPUT",
       message:
@@ -53,12 +55,12 @@ export function sortingArray(
     });
   }
 
-  const { caseInsensitive = false, customGetValue } = options || {};
+  const { caseInsensitive = false, customGetValue, order } = options || {};
 
   try {
     return documents
       .slice()
-      .sort(sortByPriority(criteria, caseInsensitive, customGetValue));
+      .sort(sortByPriority(criteria, caseInsensitive, customGetValue, order));
   } catch (error) {
     throw new SortingError({
       name: "UNEXPECTED_ERROR",
@@ -69,80 +71,110 @@ export function sortingArray(
 }
 
 function sortByPriority(
-  priorities: PriorityConfig[],
+  priorities: PriorityConfig[] | null,
   caseInsensitive: boolean,
-  customGetValue?: GetValueFunction
-) {
-  return (a: Document, b: Document): number => {
-    const basedOnValues: Record<string, any> = {};
-    for (const priority of priorities) {
-      const field = priority.field;
-      const order = priority.order;
-      const priorityValues = priority.priorities;
-      const basedOn = priority.basedOn;
+  customGetValue?: GetValueFunction,
+  order?: string
+): (a: SortableData, b: SortableData) => number {
+  return (a: SortableData, b: SortableData): number => {
+    if (Array.isArray(priorities)) {
+      const basedOnValues: Record<string, any> = {};
+      for (const priority of priorities) {
+        const field = priority.field;
+        const priorityValues = priority.priorities;
+        const basedOn = priority.basedOn;
 
-      if (basedOn && basedOn.field && basedOn.value) {
-        basedOnValues[basedOn.field] = basedOn.value;
-      }
+        if (basedOn && basedOn.field && basedOn.value) {
+          basedOnValues[basedOn.field] = basedOn.value;
+        }
 
-      const aValue = getValue(a, field, basedOnValues, customGetValue);
-      const bValue = getValue(b, field, basedOnValues, customGetValue);
+        const aValue = getValue(a, field, basedOnValues, customGetValue);
+        const bValue = getValue(b, field, basedOnValues, customGetValue);
 
-      const aPriorityIndex =
-        (priorityValues &&
-          searchValue(aValue, priorityValues, caseInsensitive)) ||
-        0;
-      const bPriorityIndex =
-        (priorityValues &&
-          searchValue(bValue, priorityValues, caseInsensitive)) ||
-        0;
+        const aPriorityIndex =
+          (priorityValues &&
+            searchValue(aValue, priorityValues, caseInsensitive)) ||
+          0;
+        const bPriorityIndex =
+          (priorityValues &&
+            searchValue(bValue, priorityValues, caseInsensitive)) ||
+          0;
 
-      if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
-        if (aPriorityIndex > bPriorityIndex) return 1;
-        if (aPriorityIndex < bPriorityIndex) return -1;
-      } else if (aPriorityIndex !== -1) {
-        return -1;
-      } else if (bPriorityIndex !== -1) {
-        return 1;
-      }
+        if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
+          if (aPriorityIndex > bPriorityIndex) return 1;
+          if (aPriorityIndex < bPriorityIndex) return -1;
+        } else if (aPriorityIndex !== -1) {
+          return -1;
+        } else if (bPriorityIndex !== -1) {
+          return 1;
+        }
 
-      if (order) {
-        const isAscending = order === "asc";
-        const isDiscending = order === "desc";
-        if (isAscending) {
-          if (isNumber(aValue) && isNumber(bValue)) {
-            return aValue - bValue;
-          } else {
-            return aValue.localeCompare(bValue);
-          }
-        } else if (isDiscending) {
-          if (isNumber(aValue) && isNumber(bValue)) {
-            return bValue - aValue;
-          } else {
-            return bValue.localeCompare(aValue);
-          }
+        if (order) {
+          return compareValues(order, aValue, bValue);
         }
       }
     }
 
-    return 0;
+    if (order) {
+      return compareValues(order, a, b);
+    } else {
+      return 0;
+    }
   };
 }
 
-function isNumber(value: any) {
-  return typeof value === "number" && !!isNaN(value);
+function compareValues(
+  order: string,
+  aValue: SortableData,
+  bValue: SortableData
+): number {
+  const isAscending = order === "asc";
+  const isDescending = order === "desc";
+
+  if (
+    (isAscending || isDescending) &&
+    typeof aValue === "number" &&
+    typeof bValue === "number"
+  ) {
+    return isAscending ? aValue - bValue : bValue - aValue;
+  }
+
+  if (
+    (isAscending || isDescending) &&
+    typeof aValue === "string" &&
+    typeof bValue === "string"
+  ) {
+    return isAscending
+      ? aValue.localeCompare(bValue)
+      : bValue.localeCompare(aValue);
+  }
+
+  return 0;
 }
 
 function getValue(
-  obj: Document,
+  obj: SortableData,
   field: string,
-  basedOnValues: Document,
+  basedOnValues: SortableData,
   customGetValue?: GetValueFunction
-): any {
+): string | number {
   if (customGetValue && typeof customGetValue === "function") {
     return customGetValue(obj, field);
   }
-  return basedOnValues[field] || obj[field];
+
+  if (
+    typeof obj === "object" &&
+    obj !== null &&
+    typeof basedOnValues === "object" &&
+    basedOnValues !== null
+  ) {
+    return (
+      (basedOnValues as Record<string, any>)[field] ||
+      (obj as Record<string, any>)[field]
+    );
+  }
+
+  return 0;
 }
 
 export function searchValue(
