@@ -8,12 +8,12 @@ You can watch a preview of how the library works in this [demo](https://codesand
 
 ## Installation
 
-To use **Array Sort Criteria** in your project, run:
+To use **Sort Array Criteria** in your project, run:
 
 ```
-npm install array-sort-criteria
+npm install sort-array-criteria
 or
-yarn add array-sort-criteria
+yarn add sort-array-criteria
 ```
 
 ## Usage
