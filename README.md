@@ -4,6 +4,8 @@ This library allows you to semi-automatically sort of documents based on specifi
 
 > Node >=12
 
+You can watch a preview of how the library works in this [demo](https://codesandbox.io/p/sandbox/sort-array-criteria-demo-q2yzg9?file=%2Fsrc%2FApp.js%3A10%2C10) version
+
 ## Installation
 
 To use **Array Sort Criteria** in your project, run:

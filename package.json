@@ -45,6 +45,7 @@
     "npm",
     "javascript",
     "typescript",
+    "ts",
     "esm",
     "cjs",
     "nodejs",
@@ -52,7 +53,8 @@
     "ecmascript",
     "array",
     "sort",
-    "criteria"
+    "criteria",
+    "data-processing"
   ],
   "author": "Simone Gattinara",
   "license": "MIT",
