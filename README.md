@@ -1,6 +1,6 @@
-# array sort criteria
+# sort array criteria
 
-This library allows you to semi-automatically sort of documents based on specified configuration parameters.
+This library allows you to semi-automatically sort documents based on specified configuration parameters, with zero dependency with TypeScript support.
 
 > Node >=12
 
