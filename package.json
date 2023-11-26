@@ -1,6 +1,6 @@
 {
   "name": "sort-array-criteria",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An npm package for sorting array of object with specific params.",
   "exports": {
     ".": {
